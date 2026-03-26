@@ -1,0 +1,18 @@
+# Normalize line endings for cross-platform clones (GitHub-friendly)
+* text=auto eol=lf
+
+*.py  text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+*.md  text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.zip binary

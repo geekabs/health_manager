@@ -1,0 +1,65 @@
+# ---- Secrets & local environment (never commit) ----
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+ENV/
+env/
+
+# ---- Test / coverage ----
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# ---- OS & editors ----
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Cursor / local IDE ----
+.cursor/
+
+# ---- Logs ----
+*.log
+
+# ---- Health / personal data (exports may contain PII) ----
+*.zip
+/data/
+/exports/
+/uploads/
+**/apple_health_export/
+**/export.xml
+
+# If you intentionally add a non-sensitive sample ZIP for tests, force-add with:
+#   git add -f tests/fixtures/sample.zip
