@@ -114,12 +114,13 @@ streamlit run app.py
 
 ## 使い方の流れ
 
-1. サイドバーから **ヘルスデータの ZIP** を選ぶ（ドラッグ＆ドロップでも可）
-2. **表示する期間**を「過去7日」などにするか、「カスタム」で開始日・終了日を指定する
-3. メイン画面で KPI とグラフを確認する
-4. AI 分析を使う場合は `.env` に API キーを入れてから **分析を実行** を押す
+1. サイドバー上部の **表示言語** で「日本語」または **English** を選ぶ（UI・グラフ・メッセージが切り替わります）
+2. サイドバーから **ヘルスデータの ZIP** を選ぶ（ドラッグ＆ドロップでも可）
+3. **表示する期間**を「過去7日」などにするか、「カスタム」で開始日・終了日を指定する
+4. メイン画面で KPI とグラフを確認する
+5. AI 分析を使う場合は `.env` に API キーを入れてから **分析を実行** を押す
 
-分析の文章のルールを変えたいときは、`prompts/analysis_system.txt` を編集して保存し、再度分析を実行してください。
+分析の文章のルールを変えたいときは、日本語 UI なら `prompts/analysis_system.txt`、英語 UI なら `prompts/analysis_system_en.txt` を編集して保存し、再度分析を実行してください。
 
 ---
 
@@ -129,8 +130,10 @@ streamlit run app.py
 health_manager/
 ├── app.py                 # 画面の入口（Streamlit）
 ├── modules/               # データ読み込み・グラフ・AI などの処理
+│   └── i18n.py            # 日本語・英語の UI 文言
 ├── prompts/
-│   └── analysis_system.txt  # AI への指示文（編集しやすいテキスト）
+│   ├── analysis_system.txt    # AI システム指示（日本語 UI 向け）
+│   └── analysis_system_en.txt # AI システム指示（英語 UI 向け）
 ├── .streamlit/
 │   └── config.toml        # 見た目（テーマ）の設定
 ├── .env.example           # 環境変数のサンプル（コピーして .env を作る）

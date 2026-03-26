@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import pandas as pd
+
+from modules.i18n import LANG_JA, tr
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -50,11 +52,11 @@ def _base_layout(fig: go.Figure, title: str) -> go.Figure:
     return fig
 
 
-def fig_blood_pressure(df: pd.DataFrame) -> go.Figure:
+def fig_blood_pressure(df: pd.DataFrame, lang: str = LANG_JA) -> go.Figure:
     fig = go.Figure()
     if df.empty:
         fig.add_annotation(
-            text="データがありません",
+            text=tr(lang, "chart_no_data"),
             xref="paper",
             yref="paper",
             x=0.5,
@@ -62,8 +64,8 @@ def fig_blood_pressure(df: pd.DataFrame) -> go.Figure:
             showarrow=False,
             font=dict(color="#3a3a3c", size=14),
         )
-        out = _base_layout(fig, "血圧の推移")
-        out.update_yaxes(title_text="血圧（mmHg）")
+        out = _base_layout(fig, tr(lang, "chart_bp_title"))
+        out.update_yaxes(title_text=tr(lang, "chart_bp_yaxis"))
         return out
 
     x = df["Date"]
@@ -71,7 +73,7 @@ def fig_blood_pressure(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=x,
             y=df["Diastolic"],
-            name="最低",
+            name=tr(lang, "legend_diastolic"),
             mode="lines",
             line=dict(color="#34c759", width=2, shape="spline"),
         )
@@ -80,23 +82,23 @@ def fig_blood_pressure(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=x,
             y=df["Systolic"],
-            name="最高",
+            name=tr(lang, "legend_systolic"),
             mode="lines",
             line=dict(color="#ff3b30", width=2.5, shape="spline"),
             fill="tonexty",
             fillcolor="rgba(255,59,48,0.12)",
         )
     )
-    out = _base_layout(fig, "血圧の推移")
-    out.update_yaxes(title_text="血圧（mmHg）")
+    out = _base_layout(fig, tr(lang, "chart_bp_title"))
+    out.update_yaxes(title_text=tr(lang, "chart_bp_yaxis"))
     return out
 
 
-def fig_heart_rate(df: pd.DataFrame) -> go.Figure:
+def fig_heart_rate(df: pd.DataFrame, lang: str = LANG_JA) -> go.Figure:
     fig = go.Figure()
     if df.empty:
         fig.add_annotation(
-            text="データがありません",
+            text=tr(lang, "chart_no_data"),
             xref="paper",
             yref="paper",
             x=0.5,
@@ -104,8 +106,8 @@ def fig_heart_rate(df: pd.DataFrame) -> go.Figure:
             showarrow=False,
             font=dict(color="#3a3a3c", size=14),
         )
-        out = _base_layout(fig, "心拍数の推移（7日移動平均）")
-        out.update_yaxes(title_text="心拍数（回/分）")
+        out = _base_layout(fig, tr(lang, "chart_hr_title"))
+        out.update_yaxes(title_text=tr(lang, "chart_hr_yaxis"))
         return out
 
     d = df.sort_values("Date").copy()
@@ -117,7 +119,7 @@ def fig_heart_rate(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=d["Date"],
             y=d["HeartRate"],
-            name="心拍（生）",
+            name=tr(lang, "legend_hr_raw"),
             mode="lines",
             line=dict(color="rgba(10,132,255,0.35)", width=1.2, shape="spline"),
         )
@@ -126,21 +128,21 @@ def fig_heart_rate(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=ma.index,
             y=ma.values,
-            name="7日移動平均",
+            name=tr(lang, "legend_hr_ma"),
             mode="lines",
             line=dict(color="#007aff", width=3, shape="spline"),
         )
     )
-    out = _base_layout(fig, "心拍数の推移（7日移動平均）")
-    out.update_yaxes(title_text="心拍数（回/分）")
+    out = _base_layout(fig, tr(lang, "chart_hr_title"))
+    out.update_yaxes(title_text=tr(lang, "chart_hr_yaxis"))
     return out
 
 
-def fig_calories_steps(df: pd.DataFrame) -> go.Figure:
+def fig_calories_steps(df: pd.DataFrame, lang: str = LANG_JA) -> go.Figure:
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     if df.empty:
         fig.add_annotation(
-            text="データがありません",
+            text=tr(lang, "chart_no_data"),
             xref="paper",
             yref="paper",
             x=0.5,
@@ -148,9 +150,13 @@ def fig_calories_steps(df: pd.DataFrame) -> go.Figure:
             showarrow=False,
             font=dict(color="#3a3a3c", size=14),
         )
-        out = _base_layout(fig, "摂取カロリーと歩数")
-        out.update_yaxes(title_text="キロカロリー（kcal）", secondary_y=False, gridcolor=_GRID, showgrid=True)
-        out.update_yaxes(title_text="歩数", secondary_y=True, gridcolor="rgba(0,0,0,0)", showgrid=False)
+        out = _base_layout(fig, tr(lang, "chart_cal_steps_title"))
+        out.update_yaxes(
+            title_text=tr(lang, "chart_yaxis_kcal"), secondary_y=False, gridcolor=_GRID, showgrid=True
+        )
+        out.update_yaxes(
+            title_text=tr(lang, "chart_yaxis_steps"), secondary_y=True, gridcolor="rgba(0,0,0,0)", showgrid=False
+        )
         return out
 
     x = df["Date"]
@@ -158,7 +164,7 @@ def fig_calories_steps(df: pd.DataFrame) -> go.Figure:
         go.Bar(
             x=x,
             y=df["DietaryEnergy"],
-            name="摂取カロリー",
+            name=tr(lang, "legend_cal"),
             marker=dict(color="rgba(255,149,0,0.85)", line=dict(width=0), cornerradius=6),
         ),
         secondary_y=False,
@@ -167,24 +173,26 @@ def fig_calories_steps(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=x,
             y=df["Steps"],
-            name="歩数",
+            name=tr(lang, "legend_steps"),
             mode="lines",
             line=dict(color="#5856d6", width=2.5, shape="spline"),
         ),
         secondary_y=True,
     )
     fig.update_layout(barmode="overlay", bargap=0.25)
-    out = _base_layout(fig, "摂取カロリーと歩数")
-    out.update_yaxes(title_text="キロカロリー（kcal）", secondary_y=False, gridcolor=_GRID, showgrid=True)
-    out.update_yaxes(title_text="歩数", secondary_y=True, gridcolor="rgba(0,0,0,0)", showgrid=False)
+    out = _base_layout(fig, tr(lang, "chart_cal_steps_title"))
+    out.update_yaxes(title_text=tr(lang, "chart_yaxis_kcal"), secondary_y=False, gridcolor=_GRID, showgrid=True)
+    out.update_yaxes(
+        title_text=tr(lang, "chart_yaxis_steps"), secondary_y=True, gridcolor="rgba(0,0,0,0)", showgrid=False
+    )
     return out
 
 
-def fig_sleep(df: pd.DataFrame) -> go.Figure:
+def fig_sleep(df: pd.DataFrame, lang: str = LANG_JA) -> go.Figure:
     fig = go.Figure()
     if df.empty:
         fig.add_annotation(
-            text="データがありません",
+            text=tr(lang, "chart_no_data"),
             xref="paper",
             yref="paper",
             x=0.5,
@@ -192,19 +200,19 @@ def fig_sleep(df: pd.DataFrame) -> go.Figure:
             showarrow=False,
             font=dict(color="#3a3a3c", size=14),
         )
-        out = _base_layout(fig, "睡眠時間の推移")
-        out.update_yaxes(title_text="睡眠時間（時間）")
+        out = _base_layout(fig, tr(lang, "chart_sleep_title"))
+        out.update_yaxes(title_text=tr(lang, "chart_sleep_yaxis"))
         return out
 
     fig.add_trace(
         go.Bar(
             x=df["Date"],
             y=df["SleepHours"],
-            name="睡眠",
+            name=tr(lang, "legend_sleep"),
             marker=dict(color="rgba(88,86,214,0.75)", line=dict(width=0), cornerradius=5),
         )
     )
     fig.update_layout(bargap=0.2)
-    out = _base_layout(fig, "睡眠時間の推移")
-    out.update_yaxes(title_text="睡眠時間（時間）")
+    out = _base_layout(fig, tr(lang, "chart_sleep_title"))
+    out.update_yaxes(title_text=tr(lang, "chart_sleep_yaxis"))
     return out

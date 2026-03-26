@@ -10,6 +10,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 from modules.analysis_prompts import load_system_instruction
+from modules.i18n import LANG_JA, tr
 
 load_dotenv()
 
@@ -21,21 +22,19 @@ def get_api_key() -> str:
     return (os.getenv("GEMINI_API_KEY") or "").strip()
 
 
-def run_analysis(stats: dict[str, Any]) -> tuple[str | None, str | None]:
+def run_analysis(stats: dict[str, Any], lang: str = LANG_JA) -> tuple[str | None, str | None]:
     """統計 dict のみを送信。戻り値: (markdown, error_message)"""
     key = get_api_key()
     if not key:
-        return None, "`.env` に GEMINI_API_KEY が設定されていません。"
+        return None, tr(lang, "err_key_missing_run")
 
     genai.configure(api_key=key)
     model = genai.GenerativeModel(
         model_name=MODEL_NAME,
-        system_instruction=load_system_instruction(),
+        system_instruction=load_system_instruction(lang),
     )
-    user = (
-        "以下は選択期間の集計のみ（個票・生ログ・身元情報は含まない）。\n\n"
-        + json.dumps(stats, ensure_ascii=False, indent=2)
-    )
+    intro = tr(lang, "ai_user_stats_intro")
+    user = intro + "\n\n" + json.dumps(stats, ensure_ascii=False, indent=2)
     try:
         resp = model.generate_content(user)
         text = getattr(resp, "text", None)
@@ -47,7 +46,7 @@ def run_analysis(stats: dict[str, Any]) -> tuple[str | None, str | None]:
                         parts.append(p.text)
             text = "\n".join(parts) if parts else None
         if not text:
-            return None, "モデルからの応答を取得できませんでした。"
+            return None, tr(lang, "err_model_empty")
         return text, None
     except Exception as e:
-        return None, f"Gemini API の呼び出しに失敗しました: {e}"
+        return None, tr(lang, "err_gemini_failed", detail=str(e))

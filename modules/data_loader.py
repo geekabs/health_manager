@@ -13,6 +13,8 @@ from typing import Any
 
 import pandas as pd
 
+from modules.i18n import tr
+
 REQUIRED_COLUMNS = [
     "Date",
     "Systolic",
@@ -31,9 +33,6 @@ NUMERIC_COLUMNS = [
     "SleepHours",
     "Steps",
 ]
-
-ZIP_LOAD_ERROR = "有効なヘルスケアデータのZIPファイルをアップロードしてください"
-
 
 @dataclass
 class LoadResult:
@@ -587,23 +586,25 @@ def _merge_daily(parts: dict[str, pd.DataFrame]) -> pd.DataFrame:
     return out
 
 
-def load_health_zip(uploaded_file: Any) -> LoadResult:
+def load_health_zip(uploaded_file: Any, lang: str = "ja") -> LoadResult:
     if uploaded_file is None:
         return LoadResult(df=None)
+
+    err_invalid = tr(lang, "zip_invalid")
 
     try:
         raw_bytes = uploaded_file.getvalue()
     except Exception:
-        return LoadResult(df=None, error=ZIP_LOAD_ERROR)
+        return LoadResult(df=None, error=err_invalid)
 
     bio = io.BytesIO(raw_bytes)
     if not zipfile.is_zipfile(bio):
-        return LoadResult(df=None, error=ZIP_LOAD_ERROR)
+        return LoadResult(df=None, error=err_invalid)
 
     try:
         zf = zipfile.ZipFile(io.BytesIO(raw_bytes))
     except zipfile.BadZipFile:
-        return LoadResult(df=None, error=ZIP_LOAD_ERROR)
+        return LoadResult(df=None, error=err_invalid)
 
     all_frames: list[pd.DataFrame] = []
     skip_files = 0
@@ -632,8 +633,8 @@ def load_health_zip(uploaded_file: Any) -> LoadResult:
             all_frames.extend(frames)
 
     if not all_frames:
-        w = f"読み取れた CSV が {skip_files} 件スキップされました。" if skip_files else None
-        return LoadResult(df=None, error=ZIP_LOAD_ERROR, warning=w)
+        w = tr(lang, "zip_warn_no_data", n=skip_files) if skip_files else None
+        return LoadResult(df=None, error=err_invalid, warning=w)
 
     systolic_f: list[pd.DataFrame] = []
     diastolic_f: list[pd.DataFrame] = []
@@ -668,7 +669,7 @@ def load_health_zip(uploaded_file: Any) -> LoadResult:
 
     merged = _merge_daily(parts)
     if merged.empty or merged["Date"].isna().all():
-        return LoadResult(df=None, error=ZIP_LOAD_ERROR)
+        return LoadResult(df=None, error=err_invalid)
 
     for col in NUMERIC_COLUMNS:
         merged[col] = pd.to_numeric(merged[col], errors="coerce")
@@ -678,7 +679,7 @@ def load_health_zip(uploaded_file: Any) -> LoadResult:
 
     warn = None
     if skip_files:
-        warn = f"解釈できなかった CSV ファイルを {skip_files} 件スキップしました。"
+        warn = tr(lang, "zip_warn_skipped_csv", n=skip_files)
 
     return LoadResult(df=merged, warning=warn)
 

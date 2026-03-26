@@ -4,15 +4,12 @@ from __future__ import annotations
 
 import streamlit as st
 
+from modules.i18n import LANG_JA, tr
 from modules import ui_components as ui
 
 
-def render_ecg_placeholder() -> None:
+def render_ecg_placeholder(lang: str = LANG_JA) -> None:
     """生データ未実装のためエラーにならないよう案内のみ表示する。"""
-    st.markdown(ui.section_title_html("心電図"), unsafe_allow_html=True)
-    st.info(
-        "心電図波形の表示は、今後アップロードされたデータから読み込み・可視化する予定です。"
-        " 現在は Apple Health エクスポート内の `electrocardiograms` 配下の CSV は"
-        " 日次指標の集計に使わず、不要なスキップ警告にも含めません。"
-    )
-    st.caption("医療診断には使用できません。参考表示のみを想定しています。")
+    st.markdown(ui.section_title_html(tr(lang, "ecg_title")), unsafe_allow_html=True)
+    st.info(tr(lang, "ecg_info"))
+    st.caption(tr(lang, "ecg_caption"))
