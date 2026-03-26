@@ -137,9 +137,31 @@ health_manager/
 ├── .streamlit/
 │   └── config.toml        # 見た目（テーマ）の設定
 ├── .env.example           # 環境変数のサンプル（コピーして .env を作る）
-├── requirements.txt       # 使う Python パッケージ一覧
+├── requirements.txt       # 本番用の Python パッケージ
+├── requirements-dev.txt   # 開発用（pytest など）
+├── pytest.ini             # pytest 設定
+├── tests/                 # 自動テスト
 └── README.md              # このファイル
 ```
+
+---
+
+## テスト（開発者向け）
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+プロジェクトのルート（`health_manager` と同じ階層）で実行してください。`pytest.ini` の `pythonpath = .` により、`pytest` 単体でも `modules` を import できます（pytest 7 以上が必要です）。
+
+カバレッジ付きで実行する例:
+
+```bash
+pytest --cov=modules --cov-report=term-missing
+```
+
+GitHub に push すると、`.github/workflows/tests.yml` により **Python 3.11 / 3.12** で `pytest` が自動実行されます。
 
 ---
 
